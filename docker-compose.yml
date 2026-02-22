@@ -1,0 +1,6 @@
+services:
+  quiz:
+    build: .
+    ports:
+      - "3004:80"
+    restart: unless-stopped

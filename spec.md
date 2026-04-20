@@ -3,7 +3,7 @@
 ## Arquitetura
 
 ```
-quiz-igreja-viva/
+reconectando-identidade-original/
 ├── docker-compose.yml
 ├── Dockerfile
 ├── nginx.conf
@@ -13,7 +13,7 @@ quiz-igreja-viva/
     │   └── styles.css      # Estilos, animações, responsividade
     ├── js/
     │   ├── app.js          # Lógica principal do quiz
-    │   ├── questions.js    # Dados das 20 perguntas
+    │   ├── questions.js    # Dados das 30 perguntas
     │   ├── sounds.js       # Gerenciamento de áudio
     │   └── confetti.js     # Animação de confetes
     ├── sounds/
@@ -54,22 +54,22 @@ services:
 const questions = [
   {
     id: 1,
-    question: "O que faz a igreja ser viva?",
+    question: "De acordo com a Bíblia, à imagem de quem fomos criados?",
     options: [
-      { letter: "A", text: "O tamanho do prédio" },
-      { letter: "B", text: "As pessoas que amam Jesus" },
-      { letter: "C", text: "O som alto" }
+      { letter: "A", text: "À imagem dos anjos" },
+      { letter: "B", text: "À imagem de Deus" },
+      { letter: "C", text: "À imagem dos nossos pais" }
     ],
     correct: "B"
   },
-  // ... 20 perguntas
+  // ... 30 perguntas
 ];
 ```
 
 ## Telas e Estados
 
 ### 1. Tela Inicial (`state: "start"`)
-- Título animado "Quiz Igreja Viva" com efeito de escala/bounce
+- Título animado "Reconectando — Identidade Original" com efeito de escala/bounce
 - Subtítulo com versículo ou frase motivacional
 - Botão "Começar" pulsante
 - Background com gradiente colorido e partículas animadas
@@ -89,14 +89,14 @@ const questions = [
 - Botão "Próxima →" aparece com delay de 1.5s
 
 ### 4. Tela Final (`state: "finished"`)
-- Placar grande: "Você acertou X de 20!"
+- Placar grande: "Você acertou X de 30!"
 - Estrelas / troféu animado
 - Confetes caindo
 - Som de celebração
 - Mensagem condicional:
-  - 20/20: "PERFEITO! 🌟"
-  - 15-19: "INCRÍVEL! 🎉"
-  - 10-14: "MUITO BEM! 👏"
+  - 30/30: "PERFEITO! 🌟"
+  - 20-29: "INCRÍVEL! 🎉"
+  - 10-19: "MUITO BEM! 👏"
   - 0-9: "CONTINUE APRENDENDO! 💪"
 - Botão "Jogar Novamente"
 
@@ -126,9 +126,10 @@ Sons gerados via Web Audio API (sintetizados) para não depender de arquivos ext
 
 | Ação | Mouse/Touch | Teclado |
 |------|------------|---------|
-| Selecionar A | Clique no card A | Tecla `1` ou `A` |
-| Selecionar B | Clique no card B | Tecla `2` ou `B` |
-| Selecionar C | Clique no card C | Tecla `3` ou `C` |
+| Selecionar equipe | Clique no painel | Tecla `1`-`6` |
+| Selecionar A | Clique no card A | Tecla `A` |
+| Selecionar B | Clique no card B | Tecla `B` |
+| Selecionar C | Clique no card C | Tecla `C` |
 | Próxima pergunta | Clique "Próxima" | `Enter` ou `→` |
 | Começar | Clique "Começar" | `Enter` |
 | Tela cheia | Clique ícone | `F11` ou `F` |

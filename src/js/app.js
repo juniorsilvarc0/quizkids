@@ -1,79 +1,105 @@
 /**
- * Quiz Igreja Viva — Lógica Principal
- * Jogo de quiz bíblico por equipes
+ * Reconectando — Identidade Original — Lógica Principal
+ * Jogo de quiz bíblico por equipes (2 a 6 equipes dinâmicas)
  */
 
 class QuizApp {
     constructor() {
+        /** Paleta de cores para até 6 equipes */
+        this.TEAM_PALETTE = [
+            { color: '#E74C3C', colorLight: '#FDEDEC', colorGlow: 'rgba(231,76,60,0.4)' },
+            { color: '#3B82F6', colorLight: '#EBF5FB', colorGlow: 'rgba(59,130,246,0.4)' },
+            { color: '#27AE60', colorLight: '#EAFAF1', colorGlow: 'rgba(39,174,96,0.4)' },
+            { color: '#8E44AD', colorLight: '#F4ECF7', colorGlow: 'rgba(142,68,173,0.4)' },
+            { color: '#F39C12', colorLight: '#FEF5E7', colorGlow: 'rgba(243,156,18,0.4)' },
+            { color: '#E91E63', colorLight: '#FCE4EC', colorGlow: 'rgba(233,30,99,0.4)' }
+        ];
+
+        /** Emojis padrão na ordem de criação */
+        this.DEFAULT_EMOJIS = ['❤️', '⭐', '🔥', '💎', '🌟', '🎯'];
+        // Nomes sugeridos por posição — o usuário pode renomear livremente
+        this.DEFAULT_NAMES = ['Confiança', 'Caminho', 'Escolhas', 'Bondade', 'Santidade', 'Paz'];
+
+        /** Emojis disponíveis no picker */
+        this.PICKER_EMOJIS = ['❤️', '⭐', '🔥', '💎', '🌟', '🎯', '👑', '🦁', '🐉', '🦅', '🎵', '⚡'];
+
+        this.MAX_TEAMS = 6;
+        this.MIN_TEAMS = 2;
+        this._nextId = 1;
+
         /** Estado do jogo */
         this.state = {
-            screen: 'start',        // start | setup | question | finished
-            questionState: 'waiting', // waiting | team_selected | answered_correct | answered_wrong_first | answered_wrong_both | answered_correct_second
+            screen: 'start',
+            questionState: 'waiting',
             currentQuestion: 0,
-            currentTeam: null,       // 1 ou 2 — equipe respondendo agora
-            firstTeamTried: null,    // equipe que tentou primeiro
-            disabledOptions: [],     // letras já eliminadas
-            teams: {
-                1: { name: 'Coração Vivo', score: 0, color: '#E74C3C', emoji: '❤️' },
-                2: { name: 'Amor em Ação', score: 0, color: '#3B82F6', emoji: '🤝' }
-            }
+            currentTeam: null,
+            teamsTriedThisQuestion: [],
+            disabledOptions: [],
+            teams: []
         };
 
         this.sound = new SoundManager();
         this.confetti = new ConfettiManager('confetti-canvas');
-        this.bloqueado = false; // evita duplo-clique
+        this.bloqueado = false;
+        this._activeEmojiPicker = null;
 
         this._cacheDOM();
+        this._initDefaultTeams();
         this._bindEvents();
+        this._renderSetupTeams();
     }
 
     /** Referências aos elementos do DOM */
     _cacheDOM() {
-        // Telas
         this.telaInicio = document.getElementById('tela-inicio');
         this.telaSetup = document.getElementById('tela-setup');
         this.telaPergunta = document.getElementById('tela-pergunta');
         this.telaFinal = document.getElementById('tela-final');
 
-        // Setup
-        this.inputEquipe1 = document.getElementById('nome-equipe-1');
-        this.inputEquipe2 = document.getElementById('nome-equipe-2');
+        this.setupContainer = document.getElementById('setup-equipes-container');
+        this.btnAdicionarEquipe = document.getElementById('btn-adicionar-equipe');
         this.btnIniciar = document.getElementById('btn-iniciar');
 
-        // Placar
-        this.placarNome1 = document.getElementById('placar-nome-1');
-        this.placarNome2 = document.getElementById('placar-nome-2');
-        this.placarPontos1 = document.getElementById('placar-pontos-1');
-        this.placarPontos2 = document.getElementById('placar-pontos-2');
-        this.placarProgresso = document.getElementById('placar-progresso');
-        this.barraFill = document.getElementById('barra-fill');
-        this.coroa1 = document.getElementById('coroa-1');
-        this.coroa2 = document.getElementById('coroa-2');
-
-        // Pergunta
+        this.placarTopo = document.getElementById('placar-topo');
         this.perguntaTexto = document.getElementById('pergunta-texto');
         this.statusMsg = document.getElementById('status-msg');
         this.paineisEquipe = document.getElementById('paineis-equipe');
-        this.painelEquipe1 = document.getElementById('painel-equipe-1');
-        this.painelEquipe2 = document.getElementById('painel-equipe-2');
-        this.painelNome1 = document.getElementById('painel-nome-1');
-        this.painelNome2 = document.getElementById('painel-nome-2');
         this.alternativasDiv = document.getElementById('alternativas');
         this.btnProxima = document.getElementById('btn-proxima');
 
-        // Final
         this.resultadoDestaque = document.getElementById('resultado-destaque');
         this.placarFinal = document.getElementById('placar-final');
 
-        // Botões gerais
         this.btnComecar = document.getElementById('btn-comecar');
         this.btnReiniciar = document.getElementById('btn-reiniciar');
         this.btnFullscreen = document.getElementById('btn-fullscreen');
     }
 
+    /** Cria as 2 equipes padrão */
+    _initDefaultTeams() {
+        this.state.teams = [
+            this._createTeam(this.DEFAULT_NAMES[0], this.DEFAULT_EMOJIS[0], 0),
+            this._createTeam(this.DEFAULT_NAMES[1], this.DEFAULT_EMOJIS[1], 1)
+        ];
+    }
+
+    /** Cria um objeto de equipe */
+    _createTeam(name, emoji, paletteIndex) {
+        const palette = this.TEAM_PALETTE[paletteIndex % this.TEAM_PALETTE.length];
+        return {
+            id: this._nextId++,
+            name: name,
+            score: 0,
+            emoji: emoji,
+            paletteIndex: paletteIndex,
+            color: palette.color,
+            colorLight: palette.colorLight,
+            colorGlow: palette.colorGlow
+        };
+    }
+
     /** Bindagem de eventos */
     _bindEvents() {
-        // Botões de navegação
         this.btnComecar.addEventListener('click', () => {
             this.sound.init();
             this.sound.playClick();
@@ -95,27 +121,31 @@ class QuizApp {
             this._restart();
         });
 
-        // Painéis de equipe
-        this.painelEquipe1.addEventListener('click', () => this._selectTeam(1));
-        this.painelEquipe2.addEventListener('click', () => this._selectTeam(2));
+        this.btnAdicionarEquipe.addEventListener('click', () => {
+            this.sound.playClick();
+            this._addTeam();
+        });
 
-        // Fullscreen
         this.btnFullscreen.addEventListener('click', () => this._toggleFullscreen());
 
-        // Teclado
         document.addEventListener('keydown', (e) => this._handleKeyboard(e));
+
+        // Fechar emoji picker ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (this._activeEmojiPicker && !e.target.closest('.emoji-picker') && !e.target.closest('.setup-emoji')) {
+                this._closeEmojiPicker();
+            }
+        });
     }
 
     /** Troca a tela visível com animação */
     _showScreen(screen) {
         this.state.screen = screen;
 
-        // Esconde todas
         [this.telaInicio, this.telaSetup, this.telaPergunta, this.telaFinal].forEach(t => {
             t.classList.remove('ativa');
         });
 
-        // Mostra a tela alvo
         const telas = {
             start: this.telaInicio,
             setup: this.telaSetup,
@@ -126,7 +156,6 @@ class QuizApp {
         const tela = telas[screen];
         if (tela) {
             tela.classList.add('ativa');
-            // Re-trigger fade-in
             const container = tela.querySelector('.container, .pergunta-conteudo');
             if (container) {
                 container.classList.remove('fade-in');
@@ -135,32 +164,226 @@ class QuizApp {
             }
         }
 
-        // Foco no input da equipe 1 ao entrar no setup
         if (screen === 'setup') {
-            setTimeout(() => this.inputEquipe1.focus(), 300);
+            this._renderSetupTeams();
+            setTimeout(() => {
+                const firstInput = this.setupContainer.querySelector('input');
+                if (firstInput) firstInput.focus();
+            }, 300);
         }
     }
 
+    /* =========================================
+       SETUP — Renderização dinâmica de equipes
+       ========================================= */
+
+    /** Renderiza todos os cards de equipe no setup */
+    _renderSetupTeams() {
+        this.setupContainer.innerHTML = '';
+        const teams = this.state.teams;
+
+        teams.forEach((team, index) => {
+            // VS separator antes de cada equipe (exceto a primeira)
+            if (index > 0) {
+                const vs = document.createElement('div');
+                vs.className = 'setup-vs';
+                vs.textContent = 'VS';
+                this.setupContainer.appendChild(vs);
+            }
+
+            const card = this._createSetupCard(team, index);
+            this.setupContainer.appendChild(card);
+        });
+
+        // Mostrar/esconder botão "+"
+        this.btnAdicionarEquipe.classList.toggle('oculto', teams.length >= this.MAX_TEAMS);
+
+        // Mostrar/esconder botões "✕"
+        const removeBtns = this.setupContainer.querySelectorAll('.btn-remover');
+        removeBtns.forEach(btn => {
+            btn.classList.toggle('oculto', teams.length <= this.MIN_TEAMS);
+        });
+    }
+
+    /** Cria um card de equipe individual para o setup */
+    _createSetupCard(team, index) {
+        const card = document.createElement('div');
+        card.className = 'setup-equipe';
+        card.dataset.teamId = team.id;
+        card.style.setProperty('--team-color', team.color);
+        card.style.setProperty('--team-light', team.colorLight);
+        card.style.setProperty('--team-glow', team.colorGlow);
+        card.style.borderColor = team.color;
+        card.style.background = `linear-gradient(180deg, ${team.colorLight}, ${this._darkenLight(team.colorLight)})`;
+        card.style.boxShadow = `0 8px 0px color-mix(in srgb, ${team.color} 70%, black), 0 12px 30px ${team.colorGlow}`;
+
+        // Emoji (clicável para picker)
+        const emoji = document.createElement('span');
+        emoji.className = 'setup-emoji';
+        emoji.textContent = team.emoji;
+        emoji.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this._toggleEmojiPicker(team.id, emoji);
+        });
+
+        // Label
+        const label = document.createElement('label');
+        label.textContent = `Equipe ${index + 1}`;
+
+        // Input para nome
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Nome do time';
+        input.maxLength = 24;
+        input.autocomplete = 'off';
+        input.value = team.name;
+        input.style.borderColor = team.color + '4D';
+        input.addEventListener('input', () => {
+            team.name = input.value;
+        });
+
+        // Botão remover
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'btn-remover';
+        removeBtn.textContent = '✕';
+        removeBtn.addEventListener('click', () => {
+            this.sound.playClick();
+            this._removeTeam(team.id);
+        });
+
+        card.appendChild(removeBtn);
+        card.appendChild(emoji);
+        card.appendChild(label);
+        card.appendChild(input);
+
+        return card;
+    }
+
+    /** Escurece levemente uma cor light para gradiente */
+    _darkenLight(hex) {
+        const r = Math.max(0, parseInt(hex.slice(1, 3), 16) - 20);
+        const g = Math.max(0, parseInt(hex.slice(3, 5), 16) - 20);
+        const b = Math.max(0, parseInt(hex.slice(5, 7), 16) - 20);
+        return '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('');
+    }
+
+    /** Adiciona uma nova equipe */
+    _addTeam() {
+        if (this.state.teams.length >= this.MAX_TEAMS) return;
+
+        const nextIndex = this.state.teams.length;
+        const emoji = this.DEFAULT_EMOJIS[nextIndex % this.DEFAULT_EMOJIS.length];
+        const name = this.DEFAULT_NAMES[nextIndex] || `Equipe ${nextIndex + 1}`;
+        const team = this._createTeam(name, emoji, nextIndex);
+
+        this.state.teams.push(team);
+        this._renderSetupTeams();
+    }
+
+    /** Remove uma equipe pelo ID */
+    _removeTeam(teamId) {
+        if (this.state.teams.length <= this.MIN_TEAMS) return;
+        this.state.teams = this.state.teams.filter(t => t.id !== teamId);
+        this._renderSetupTeams();
+    }
+
+    /** Abre/fecha o emoji picker para uma equipe */
+    _toggleEmojiPicker(teamId, emojiEl) {
+        this._closeEmojiPicker();
+
+        const picker = document.createElement('div');
+        picker.className = 'emoji-picker';
+
+        this.PICKER_EMOJIS.forEach(em => {
+            const btn = document.createElement('button');
+            btn.textContent = em;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const team = this.state.teams.find(t => t.id === teamId);
+                if (team) {
+                    team.emoji = em;
+                    emojiEl.textContent = em;
+                }
+                this._closeEmojiPicker();
+            });
+            picker.appendChild(btn);
+        });
+
+        emojiEl.parentElement.appendChild(picker);
+        this._activeEmojiPicker = picker;
+    }
+
+    /** Fecha o emoji picker ativo */
+    _closeEmojiPicker() {
+        if (this._activeEmojiPicker) {
+            this._activeEmojiPicker.remove();
+            this._activeEmojiPicker = null;
+        }
+    }
+
+    /* =========================================
+       QUIZ — Início e fluxo
+       ========================================= */
+
     /** Inicia o quiz com os nomes das equipes */
     _startQuiz() {
-        const nome1 = this.inputEquipe1.value.trim() || 'Coração Vivo';
-        const nome2 = this.inputEquipe2.value.trim() || 'Amor em Ação';
+        // Lê os nomes dos inputs do setup
+        const inputs = this.setupContainer.querySelectorAll('input');
+        inputs.forEach((input, i) => {
+            if (this.state.teams[i]) {
+                this.state.teams[i].name = input.value.trim() || this.state.teams[i].name;
+            }
+        });
 
-        this.state.teams[1].name = nome1;
-        this.state.teams[2].name = nome2;
-        this.state.teams[1].score = 0;
-        this.state.teams[2].score = 0;
+        // Reset scores
+        this.state.teams.forEach(t => t.score = 0);
         this.state.currentQuestion = 0;
 
-        // Atualiza nomes no placar e painéis
-        this.placarNome1.textContent = nome1;
-        this.placarNome2.textContent = nome2;
-        this.painelNome1.textContent = nome1;
-        this.painelNome2.textContent = nome2;
-
-        this._updateScoreboard();
+        this._renderPlacarTopo();
         this._showScreen('question');
         this._showQuestion();
+    }
+
+    /** Renderiza o placar no topo (dinâmico para N equipes) */
+    _renderPlacarTopo() {
+        const teams = this.state.teams;
+        this.placarTopo.innerHTML = '';
+
+        // Adicionar classe compacta se muitas equipes
+        this.placarTopo.classList.toggle('placar-topo-compact', teams.length > 3);
+
+        teams.forEach((team, i) => {
+            const div = document.createElement('div');
+            div.className = 'placar-equipe';
+            div.dataset.teamId = team.id;
+            div.style.setProperty('--team-color', team.color);
+            div.style.setProperty('--team-light', team.colorLight);
+            div.style.setProperty('--team-glow', team.colorGlow);
+            div.style.background = team.colorLight;
+            div.style.borderColor = 'rgba(0,0,0,0.1)';
+
+            div.innerHTML = `
+                <span class="placar-coroa" data-coroa="${team.id}"></span>
+                <span class="placar-emoji">${team.emoji}</span>
+                <span class="placar-nome">${team.name}</span>
+                <span class="placar-pontos" data-pontos="${team.id}">${team.score}</span>
+            `;
+
+            this.placarTopo.appendChild(div);
+
+            // Adicionar centro de progresso após o último time da primeira "metade" ou no meio
+            if (i === Math.floor((teams.length - 1) / 2)) {
+                const centro = document.createElement('div');
+                centro.className = 'placar-centro';
+                centro.innerHTML = `
+                    <span id="placar-progresso">Pergunta 1 de ${questions.length}</span>
+                    <div class="barra-progresso">
+                        <div class="barra-progresso-fill" id="barra-fill"></div>
+                    </div>
+                `;
+                this.placarTopo.appendChild(centro);
+            }
+        });
     }
 
     /** Renderiza a pergunta atual */
@@ -168,67 +391,102 @@ class QuizApp {
         const q = questions[this.state.currentQuestion];
         if (!q) return;
 
-        // Reset do estado
         this.state.questionState = 'waiting';
         this.state.currentTeam = null;
-        this.state.firstTeamTried = null;
+        this.state.teamsTriedThisQuestion = [];
         this.state.disabledOptions = [];
         this.bloqueado = false;
 
-        // Atualiza progresso
         this._updateScoreboard();
 
-        // Exibe a pergunta com animação
         this.perguntaTexto.textContent = q.question;
         this.perguntaTexto.classList.remove('fade-in');
         void this.perguntaTexto.offsetWidth;
         this.perguntaTexto.classList.add('fade-in');
 
-        // Status inicial
         this._setStatus('Quem responde primeiro?', '');
 
-        // Mostra painéis de equipe (ambos ativos e pulsando)
-        this.paineisEquipe.style.display = 'flex';
-        this.painelEquipe1.className = 'painel-equipe painel-equipe-1 pulse';
-        this.painelEquipe2.className = 'painel-equipe painel-equipe-2 pulse';
+        this._renderTeamPanels();
 
-        // Esconde alternativas e botão próxima
         this.alternativasDiv.innerHTML = '';
         this.btnProxima.style.display = 'none';
     }
 
+    /** Renderiza os painéis de seleção de equipe */
+    _renderTeamPanels(onlyAvailable) {
+        this.paineisEquipe.innerHTML = '';
+        this.paineisEquipe.style.display = 'flex';
+
+        // Label
+        const label = document.createElement('div');
+        label.className = 'paineis-label';
+        label.textContent = 'Quem responde?';
+        this.paineisEquipe.appendChild(label);
+
+        const teams = this.state.teams;
+        teams.forEach((team, index) => {
+            const tried = this.state.teamsTriedThisQuestion.includes(team.id);
+
+            const btn = document.createElement('button');
+            btn.className = 'painel-equipe pulse';
+            btn.dataset.teamId = team.id;
+            btn.style.setProperty('--team-color', team.color);
+            btn.style.setProperty('--team-light', team.colorLight);
+            btn.style.setProperty('--team-glow', team.colorGlow);
+
+            if (tried) {
+                btn.classList.remove('pulse');
+                btn.classList.add('desativado');
+            }
+
+            btn.innerHTML = `
+                <span class="painel-emoji">${team.emoji}</span>
+                <span class="painel-nome">${team.name}</span>
+            `;
+
+            if (!tried) {
+                btn.addEventListener('click', () => this._selectTeam(team.id));
+            }
+
+            this.paineisEquipe.appendChild(btn);
+        });
+    }
+
     /** Seleciona qual equipe vai responder */
-    _selectTeam(teamNum) {
+    _selectTeam(teamId) {
         if (this.bloqueado) return;
 
         const st = this.state.questionState;
+        const team = this.state.teams.find(t => t.id === teamId);
+        if (!team) return;
 
-        // Só permite selecionar equipe no estado 'waiting' ou quando é segunda chance
-        if (st === 'waiting') {
-            this.state.firstTeamTried = teamNum;
-        } else if (st === 'answered_wrong_first') {
-            // Na segunda chance, só a outra equipe pode responder
-            const outra = this.state.firstTeamTried === 1 ? 2 : 1;
-            if (teamNum !== outra) return;
-        } else {
-            return;
-        }
+        // Só permite selecionar equipe que ainda não tentou
+        if (this.state.teamsTriedThisQuestion.includes(teamId)) return;
+
+        if (st !== 'waiting' && st !== 'second_chance') return;
 
         this.sound.playClick();
-        this.state.currentTeam = teamNum;
+        this.state.currentTeam = teamId;
         this.state.questionState = 'team_selected';
 
-        // Destaca equipe selecionada, opaco na outra
-        const outraNum = teamNum === 1 ? 2 : 1;
-        const painelSel = teamNum === 1 ? this.painelEquipe1 : this.painelEquipe2;
-        const painelOutro = outraNum === 1 ? this.painelEquipe1 : this.painelEquipe2;
+        // Destaca equipe selecionada, opaco nas outras
+        const panels = this.paineisEquipe.querySelectorAll('.painel-equipe');
+        panels.forEach(p => {
+            const pid = parseInt(p.dataset.teamId);
+            if (pid === teamId) {
+                p.className = 'painel-equipe selecionado';
+                p.style.setProperty('--team-color', team.color);
+                p.style.setProperty('--team-light', team.colorLight);
+                p.style.setProperty('--team-glow', team.colorGlow);
+            } else if (this.state.teamsTriedThisQuestion.includes(pid)) {
+                p.className = 'painel-equipe desativado';
+            } else {
+                p.className = 'painel-equipe opaco';
+            }
+        });
 
-        painelSel.className = `painel-equipe painel-equipe-${teamNum} selecionado`;
-        painelOutro.className = `painel-equipe painel-equipe-${outraNum} opaco`;
+        this._setStatus(`${team.name} responde!`, team.color);
 
-        this._setStatus(`${this.state.teams[teamNum].name} responde!`, this.state.teams[teamNum].color);
-
-        // Mostra alternativas com animação slide-up
         this._renderOptions();
     }
 
@@ -242,7 +500,6 @@ class QuizApp {
             btn.className = 'alternativa';
             btn.dataset.letter = opt.letter;
 
-            // Se a alternativa já foi eliminada (segunda chance)
             if (this.state.disabledOptions.includes(opt.letter)) {
                 btn.classList.add('riscada');
             }
@@ -255,7 +512,6 @@ class QuizApp {
 
             this.alternativasDiv.appendChild(btn);
 
-            // Animação slide-up escalonada
             setTimeout(() => {
                 btn.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
                 btn.classList.add('visivel');
@@ -271,79 +527,63 @@ class QuizApp {
 
         const q = questions[this.state.currentQuestion];
         const isCorrect = letter === q.correct;
-        const teamNum = this.state.currentTeam;
-        const isSecondChance = this.state.firstTeamTried !== null && this.state.firstTeamTried !== teamNum;
+        const teamId = this.state.currentTeam;
+        const team = this.state.teams.find(t => t.id === teamId);
 
-        // Marca a alternativa clicada
+        // Marca a equipe como tendo tentado
+        this.state.teamsTriedThisQuestion.push(teamId);
+
         const btns = this.alternativasDiv.querySelectorAll('.alternativa');
         btns.forEach(btn => {
             const l = btn.dataset.letter;
             if (l === letter) {
                 btn.classList.add(isCorrect ? 'correta' : 'errada');
             }
-            if (!isCorrect && l === q.correct) {
-                // Não revela a correta ainda se for primeira tentativa
-            }
             btn.classList.add('desabilitada');
         });
 
         if (isCorrect) {
-            // ACERTOU!
-            this.state.questionState = isSecondChance ? 'answered_correct_second' : 'answered_correct';
-            this.state.teams[teamNum].score++;
+            this.state.questionState = 'answered_correct';
+            team.score++;
             this.sound.playCorrect();
-            this.confetti.burst(this.state.teams[teamNum].color);
+            this.confetti.burst(team.color);
 
-            this._setStatus(`${this.state.teams[teamNum].name} acertou!`, this.state.teams[teamNum].color);
+            this._setStatus(`${team.name} acertou!`, team.color);
             this._updateScoreboard();
-            this._animateScore(teamNum);
+            this._animateScore(teamId);
 
-            // Mostra botão próxima
             setTimeout(() => {
                 this.btnProxima.style.display = 'inline-block';
                 this.bloqueado = false;
             }, 800);
 
         } else {
-            // ERROU
             this.sound.playWrong();
+            this.state.disabledOptions.push(letter);
 
-            if (!isSecondChance) {
-                // Primeira equipe errou — segunda chance para a outra
-                this.state.questionState = 'answered_wrong_first';
-                this.state.disabledOptions.push(letter);
+            // Verificar se restam equipes que ainda não tentaram
+            const remaining = this.state.teams.filter(t => !this.state.teamsTriedThisQuestion.includes(t.id));
 
-                const outraNum = teamNum === 1 ? 2 : 1;
-                const nomeOutra = this.state.teams[outraNum].name;
+            if (remaining.length > 0) {
+                // Ainda há equipes que podem tentar
+                this.state.questionState = 'second_chance';
 
-                this._setStatus(`Errou! Vez de ${nomeOutra}!`, this.state.teams[outraNum].color);
+                this._setStatus('Errou! Quem tenta agora?', '#FF8C42');
 
-                // Toca som de atenção
                 setTimeout(() => {
                     this.sound.playAttention();
                 }, 400);
 
-                // Após delay, mostra painéis para a outra equipe
                 setTimeout(() => {
-                    // Destaca a outra equipe
-                    const painelOutro = outraNum === 1 ? this.painelEquipe1 : this.painelEquipe2;
-                    const painelErrou = teamNum === 1 ? this.painelEquipe1 : this.painelEquipe2;
-
-                    painelOutro.className = `painel-equipe painel-equipe-${outraNum} pulse`;
-                    painelErrou.className = `painel-equipe painel-equipe-${teamNum} opaco`;
-
+                    this._renderTeamPanels(true);
                     this.bloqueado = false;
-
-                    // Auto-seleciona a outra equipe para responder
-                    this._selectTeam(outraNum);
                 }, 1200);
 
             } else {
-                // Segunda equipe também errou — ninguém pontua
-                this.state.questionState = 'answered_wrong_both';
+                // Todas as equipes erraram
+                this.state.questionState = 'answered_wrong_all';
                 this._setStatus('Ninguém pontuou!', '#FF8C42');
 
-                // Revela a resposta correta
                 btns.forEach(btn => {
                     if (btn.dataset.letter === q.correct) {
                         btn.classList.remove('desabilitada');
@@ -351,7 +591,6 @@ class QuizApp {
                     }
                 });
 
-                // Mostra botão próxima
                 setTimeout(() => {
                     this.btnProxima.style.display = 'inline-block';
                     this.bloqueado = false;
@@ -375,45 +614,41 @@ class QuizApp {
     _showResults() {
         this._showScreen('finished');
 
-        const s1 = this.state.teams[1].score;
-        const s2 = this.state.teams[2].score;
-        const n1 = this.state.teams[1].name;
-        const n2 = this.state.teams[2].name;
+        const teams = this.state.teams;
+        const sorted = [...teams].sort((a, b) => b.score - a.score);
+        const maxScore = sorted[0].score;
+        const winners = sorted.filter(t => t.score === maxScore);
 
-        // Determina vencedor
+        // Mensagem de destaque
         let msgDestaque = '';
-        let coresConfete = [];
-
-        if (s1 > s2) {
-            msgDestaque = `🏆 ${n1} venceu! 🏆`;
-            coresConfete = [this.state.teams[1].color, '#FFD93D', '#4CAF50'];
-        } else if (s2 > s1) {
-            msgDestaque = `🏆 ${n2} venceu! 🏆`;
-            coresConfete = [this.state.teams[2].color, '#FFD93D', '#4CAF50'];
+        if (winners.length === teams.length) {
+            msgDestaque = 'Empate geral! 🤝';
+        } else if (winners.length === 1) {
+            msgDestaque = `🏆 ${winners[0].name} venceu! 🏆`;
         } else {
-            msgDestaque = 'Empate! 🤝';
-            coresConfete = [this.state.teams[1].color, this.state.teams[2].color, '#FFD93D'];
+            const names = winners.map(w => w.name).join(' e ');
+            msgDestaque = `🏆 Empate entre ${names}! 🏆`;
         }
 
         this.resultadoDestaque.textContent = msgDestaque;
 
-        // Placar final
-        const vencedor1 = s1 > s2 ? 'vencedor' : '';
-        const vencedor2 = s2 > s1 ? 'vencedor' : '';
+        // Placar final ordenado
+        this.placarFinal.innerHTML = '';
+        sorted.forEach((team, i) => {
+            const isWinner = team.score === maxScore;
+            const div = document.createElement('div');
+            div.className = 'placar-final-equipe' + (isWinner ? ' vencedor' : '');
 
-        this.placarFinal.innerHTML = `
-            <div class="placar-final-equipe ${vencedor1}">
-                <div class="placar-final-nome">❤️ ${n1}</div>
-                <div class="placar-final-pontos" style="color: ${this.state.teams[1].color}">${s1}</div>
-            </div>
-            <div class="placar-final-vs">✕</div>
-            <div class="placar-final-equipe ${vencedor2}">
-                <div class="placar-final-nome">🤝 ${n2}</div>
-                <div class="placar-final-pontos" style="color: ${this.state.teams[2].color}">${s2}</div>
-            </div>
-        `;
+            div.innerHTML = `
+                <div class="placar-final-nome">${team.emoji} ${team.name}</div>
+                <div class="placar-final-pontos" style="color: ${team.color}">${team.score}</div>
+            `;
 
-        // Celebração
+            this.placarFinal.appendChild(div);
+        });
+
+        // Confetes com cores dos vencedores
+        const coresConfete = winners.map(w => w.color).concat(['#FFD93D']);
         this.sound.playCelebration();
         this.confetti.rain(coresConfete);
     }
@@ -421,46 +656,60 @@ class QuizApp {
     /** Reinicia o jogo */
     _restart() {
         this.confetti.stop();
-        this.state.teams[1].score = 0;
-        this.state.teams[2].score = 0;
+        this.state.teams.forEach(t => t.score = 0);
         this.state.currentQuestion = 0;
         this._showScreen('setup');
     }
 
     /** Atualiza o placar no topo */
     _updateScoreboard() {
-        const s1 = this.state.teams[1].score;
-        const s2 = this.state.teams[2].score;
+        const teams = this.state.teams;
+        const maxScore = Math.max(...teams.map(t => t.score));
+        const hasLeader = maxScore > 0;
 
-        this.placarPontos1.textContent = s1;
-        this.placarPontos2.textContent = s2;
+        teams.forEach(team => {
+            const pontosEl = this.placarTopo.querySelector(`[data-pontos="${team.id}"]`);
+            const coroaEl = this.placarTopo.querySelector(`[data-coroa="${team.id}"]`);
+            const equipEl = pontosEl ? pontosEl.closest('.placar-equipe') : null;
+
+            if (pontosEl) pontosEl.textContent = team.score;
+
+            if (coroaEl) {
+                const isLeader = hasLeader && team.score === maxScore;
+                coroaEl.textContent = isLeader ? '👑' : '';
+                coroaEl.classList.toggle('visivel', isLeader);
+            }
+
+            if (equipEl) {
+                const isLeader = hasLeader && team.score === maxScore;
+                equipEl.classList.toggle('na-frente', isLeader);
+                if (isLeader) {
+                    equipEl.style.borderColor = team.color;
+                } else {
+                    equipEl.style.borderColor = 'rgba(0,0,0,0.1)';
+                }
+            }
+        });
 
         // Progresso
-        const num = this.state.currentQuestion + 1;
-        const total = questions.length;
-        this.placarProgresso.textContent = `Pergunta ${num} de ${total}`;
-        this.barraFill.style.width = `${(num / total) * 100}%`;
-
-        // Destaque para equipe na frente
-        const pe1 = this.placarPontos1.closest('.placar-equipe');
-        const pe2 = this.placarPontos2.closest('.placar-equipe');
-
-        pe1.classList.toggle('na-frente', s1 > s2);
-        pe2.classList.toggle('na-frente', s2 > s1);
-
-        // Coroa
-        this.coroa1.textContent = s1 > s2 ? '👑' : '';
-        this.coroa2.textContent = s2 > s1 ? '👑' : '';
-        this.coroa1.classList.toggle('visivel', s1 > s2);
-        this.coroa2.classList.toggle('visivel', s2 > s1);
+        const progressoEl = document.getElementById('placar-progresso');
+        const barraEl = document.getElementById('barra-fill');
+        if (progressoEl && barraEl) {
+            const num = this.state.currentQuestion + 1;
+            const total = questions.length;
+            progressoEl.textContent = `Pergunta ${num} de ${total}`;
+            barraEl.style.width = `${(num / total) * 100}%`;
+        }
     }
 
     /** Animação de pulse no placar ao pontuar */
-    _animateScore(teamNum) {
-        const el = teamNum === 1 ? this.placarPontos1 : this.placarPontos2;
-        el.classList.remove('pontuar');
-        void el.offsetWidth;
-        el.classList.add('pontuar');
+    _animateScore(teamId) {
+        const el = this.placarTopo.querySelector(`[data-pontos="${teamId}"]`);
+        if (el) {
+            el.classList.remove('pontuar');
+            void el.offsetWidth;
+            el.classList.add('pontuar');
+        }
     }
 
     /** Define a mensagem de status */
@@ -493,13 +742,15 @@ class QuizApp {
         // Tela de pergunta
         if (this.state.screen !== 'question') return;
 
-        // Selecionar equipe (1/Q para equipe 1, 2/W para equipe 2)
-        if ((key === '1' || key === 'Q') && (this.state.questionState === 'waiting' || this.state.questionState === 'answered_wrong_first')) {
-            this._selectTeam(1);
-            return;
-        }
-        if ((key === '2' || key === 'W') && (this.state.questionState === 'waiting' || this.state.questionState === 'answered_wrong_first')) {
-            this._selectTeam(2);
+        // Selecionar equipe (teclas 1-6)
+        if (key >= '1' && key <= '6') {
+            const index = parseInt(key) - 1;
+            if (this.state.questionState === 'waiting' || this.state.questionState === 'second_chance') {
+                const team = this.state.teams[index];
+                if (team && !this.state.teamsTriedThisQuestion.includes(team.id)) {
+                    this._selectTeam(team.id);
+                }
+            }
             return;
         }
 

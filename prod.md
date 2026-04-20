@@ -1,8 +1,8 @@
-# PROD.md — Quiz Igreja Viva
+# PROD.md — Reconectando — Identidade Original
 
 ## Visão Geral do Produto
 
-Aplicação web interativa para apresentar um quiz bíblico infantil chamado **"Igreja Viva"** em formato de tela cheia. Projetado para ser usado em cultos infantis, células kids ou eventos da igreja, onde um líder projeta o quiz em um telão e as crianças participam respondendo em voz alta ou levantando a mão.
+Aplicação web interativa para apresentar um quiz bíblico infantil chamado **"Reconectando — Identidade Original"** em formato de tela cheia. Projetado para ser usado em cultos infantis, células kids ou eventos da igreja, onde um líder projeta o quiz em um telão e as crianças participam respondendo em voz alta ou levantando a mão.
 
 ## Público-Alvo
 
@@ -19,7 +19,7 @@ Aplicação web interativa para apresentar um quiz bíblico infantil chamado **"
 ## Funcionalidades (MVP)
 
 ### Tela Inicial
-- Logo/título "Quiz Igreja Viva" com animação de entrada
+- Logo/título "Reconectando — Identidade Original" com animação de entrada
 - Botão "Começar" grande e chamativo
 - Música/som de fundo opcional
 
@@ -29,7 +29,7 @@ Aplicação web interativa para apresentar um quiz bíblico infantil chamado **"
 - Ao clicar numa alternativa:
   - **Acerto:** animação de celebração (confetes, estrelas) + som de acerto + destaque verde
   - **Erro:** animação suave de erro + som de erro + destaque vermelho + mostra a resposta correta
-- Indicador de progresso (pergunta X de 20)
+- Indicador de progresso (pergunta X de 30)
 - Botão "Próxima" aparece após responder
 
 ### Tela Final

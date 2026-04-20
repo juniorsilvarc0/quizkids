@@ -1,5 +1,5 @@
 /**
- * Quiz Igreja Viva — Gerenciador de Confetes
+ * Reconectando — Identidade Original — Gerenciador de Confetes
  * Animação de partículas via Canvas API
  */
 

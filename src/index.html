@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Igreja Viva</title>
+    <title>Reconectando — Sem Medo</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -35,7 +35,7 @@
     <!-- TELA INICIAL -->
     <section id="tela-inicio" class="tela ativa">
         <div class="container fade-in">
-            <h1 class="titulo-principal bounce">Quiz<br>Igreja Viva</h1>
+            <h1 class="titulo-principal bounce">Reconectando<br>Sem Medo</h1>
             <p class="subtitulo">Desafios, perguntas e muita diversão!</p>
             <button id="btn-comecar" class="btn btn-grande pulse">Começar!</button>
         </div>
@@ -45,19 +45,8 @@
     <section id="tela-setup" class="tela">
         <div class="container fade-in">
             <h2 class="titulo-setup">Nossas Equipes!</h2>
-            <div class="setup-equipes">
-                <div class="setup-equipe equipe-1-bg">
-                    <span class="setup-emoji">❤️</span>
-                    <label for="nome-equipe-1">Time Coração Vivo</label>
-                    <input type="text" id="nome-equipe-1" placeholder="Nome do time" maxlength="24" autocomplete="off" value="Coração Vivo">
-                </div>
-                <div class="setup-vs">VS</div>
-                <div class="setup-equipe equipe-2-bg">
-                    <span class="setup-emoji">🤝</span>
-                    <label for="nome-equipe-2">Time Amor em Ação</label>
-                    <input type="text" id="nome-equipe-2" placeholder="Nome do time" maxlength="24" autocomplete="off" value="Amor em Ação">
-                </div>
-            </div>
+            <div id="setup-equipes-container" class="setup-equipes"></div>
+            <button id="btn-adicionar-equipe" class="btn btn-adicionar">+ Adicionar Equipe</button>
             <button id="btn-iniciar" class="btn btn-grande pulse">Iniciar Quiz</button>
         </div>
     </section>
@@ -65,24 +54,7 @@
     <!-- TELA DE PERGUNTA -->
     <section id="tela-pergunta" class="tela">
         <!-- Placar fixo no topo -->
-        <div id="placar-topo">
-            <div class="placar-equipe placar-equipe-1">
-                <span class="placar-coroa" id="coroa-1"></span>
-                <span class="placar-nome" id="placar-nome-1">Equipe 1</span>
-                <span class="placar-pontos" id="placar-pontos-1">0</span>
-            </div>
-            <div class="placar-centro">
-                <span id="placar-progresso">Pergunta 1 de 20</span>
-                <div class="barra-progresso">
-                    <div class="barra-progresso-fill" id="barra-fill"></div>
-                </div>
-            </div>
-            <div class="placar-equipe placar-equipe-2">
-                <span class="placar-pontos" id="placar-pontos-2">0</span>
-                <span class="placar-nome" id="placar-nome-2">Equipe 2</span>
-                <span class="placar-coroa" id="coroa-2"></span>
-            </div>
-        </div>
+        <div id="placar-topo"></div>
 
         <!-- Conteúdo da pergunta -->
         <div class="pergunta-conteudo">
@@ -92,17 +64,7 @@
             <div class="status-msg" id="status-msg"></div>
 
             <!-- Painéis de seleção de equipe -->
-            <div class="paineis-equipe" id="paineis-equipe">
-                <button class="painel-equipe painel-equipe-1 pulse" id="painel-equipe-1">
-                    <span class="painel-emoji">❤️</span>
-                    <span class="painel-nome" id="painel-nome-1">Coração Vivo</span>
-                </button>
-                <div class="paineis-label">Quem responde?</div>
-                <button class="painel-equipe painel-equipe-2 pulse" id="painel-equipe-2">
-                    <span class="painel-emoji">🤝</span>
-                    <span class="painel-nome" id="painel-nome-2">Amor em Ação</span>
-                </button>
-            </div>
+            <div id="paineis-equipe" class="paineis-equipe"></div>
 
             <!-- Alternativas -->
             <div class="alternativas" id="alternativas"></div>

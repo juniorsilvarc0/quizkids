@@ -1,5 +1,5 @@
 /* ============================================
-   Quiz Igreja Viva — Estilos
+   Reconectando — Identidade Original — Estilos
    Visual inspirado no Reconectando Kids PDF
    ============================================ */
 
@@ -10,13 +10,25 @@
 }
 
 :root {
-    /* Equipes */
-    --equipe-1: #E74C3C;
-    --equipe-1-light: #FDEDEC;
-    --equipe-1-glow: rgba(231, 76, 60, 0.4);
-    --equipe-2: #3B82F6;
-    --equipe-2-light: #EBF5FB;
-    --equipe-2-glow: rgba(59, 130, 246, 0.4);
+    /* Paleta de 6 equipes */
+    --team-1: #E74C3C;
+    --team-1-light: #FDEDEC;
+    --team-1-glow: rgba(231, 76, 60, 0.4);
+    --team-2: #3B82F6;
+    --team-2-light: #EBF5FB;
+    --team-2-glow: rgba(59, 130, 246, 0.4);
+    --team-3: #27AE60;
+    --team-3-light: #EAFAF1;
+    --team-3-glow: rgba(39, 174, 96, 0.4);
+    --team-4: #8E44AD;
+    --team-4-light: #F4ECF7;
+    --team-4-glow: rgba(142, 68, 173, 0.4);
+    --team-5: #F39C12;
+    --team-5-light: #FEF5E7;
+    --team-5-glow: rgba(243, 156, 18, 0.4);
+    --team-6: #E91E63;
+    --team-6-light: #FCE4EC;
+    --team-6-glow: rgba(233, 30, 99, 0.4);
 
     /* Paleta vibrante */
     --amarelo: #FFD93D;
@@ -187,7 +199,7 @@ body {
 .container {
     text-align: center;
     padding: 28px;
-    max-width: 1000px;
+    max-width: 1100px;
     width: 100%;
     position: relative;
     z-index: 2;
@@ -276,11 +288,38 @@ body {
         0 12px 28px rgba(0, 0, 0, 0.25);
 }
 
+/* Botão adicionar equipe */
+.btn-adicionar {
+    font-size: 1.4rem;
+    padding: 16px 36px;
+    background: transparent;
+    color: var(--texto-medio);
+    border: 4px dashed #ccc;
+    border-radius: var(--radius-lg);
+    margin-bottom: 28px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    transition: all 0.3s ease;
+}
+
+.btn-adicionar:hover {
+    border-color: var(--verde);
+    color: var(--verde);
+    background: rgba(39, 174, 96, 0.05);
+    transform: translateY(-2px);
+}
+
+.btn-adicionar.oculto {
+    display: none;
+}
+
 /* ============================================
    TELA SETUP — Configuração de equipes
    ============================================ */
 #tela-setup {
     background: linear-gradient(180deg, #C8E6F9 0%, #FFF8E7 40%, #FDEBD0 100%);
+    overflow-y: auto;
 }
 
 .titulo-setup {
@@ -299,63 +338,64 @@ body {
     display: flex;
     align-items: stretch;
     justify-content: center;
-    gap: 28px;
-    margin-bottom: 44px;
+    gap: 0;
+    margin-bottom: 28px;
     flex-wrap: wrap;
 }
 
 .setup-equipe {
     border-radius: var(--radius-lg);
-    padding: 32px 28px;
-    width: 310px;
+    padding: 28px 24px;
+    width: 250px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     transition: all 0.3s ease;
-    border: 4px solid transparent;
+    border: 4px solid var(--team-color, #ccc);
+    background: var(--team-light, #f5f5f5);
+    position: relative;
+    animation: fadeSlideIn 0.4s ease;
 }
 
-.equipe-1-bg {
-    background: linear-gradient(180deg, #FBE3E1, #F5C6C2);
-    border-color: var(--equipe-1);
-    box-shadow: 0 8px 0px #C0392B, 0 12px 30px rgba(231, 76, 60, 0.15);
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.equipe-2-bg {
-    background: linear-gradient(180deg, #DDE9FA, #BDD7F1);
-    border-color: var(--equipe-2);
-    box-shadow: 0 8px 0px #1E5BB8, 0 12px 30px rgba(59, 130, 246, 0.15);
-}
-
-.setup-emoji {
-    font-size: 4.5rem;
+.setup-equipe .setup-emoji {
+    font-size: 4rem;
     filter: drop-shadow(2px 3px 4px rgba(0,0,0,0.15));
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.setup-equipe .setup-emoji:hover {
+    transform: scale(1.15);
 }
 
 .setup-equipe label {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 800;
     color: var(--texto-escuro);
 }
 
 .setup-equipe input {
     width: 100%;
-    padding: 14px 18px;
+    padding: 12px 16px;
     border-radius: var(--radius);
     border: 3px solid rgba(0, 0, 0, 0.1);
     background: var(--branco);
     color: var(--texto-escuro);
-    font-size: 1.35rem;
+    font-size: 1.2rem;
     font-family: inherit;
     font-weight: 700;
     text-align: center;
     outline: none;
     transition: all 0.2s ease;
+    border-color: var(--team-color, rgba(0,0,0,0.1));
+    opacity: 0.6;
 }
-
-.equipe-1-bg input { border-color: rgba(231, 76, 60, 0.3); }
-.equipe-2-bg input { border-color: rgba(59, 130, 246, 0.3); }
 
 .setup-equipe input::placeholder {
     color: #aaa;
@@ -365,14 +405,84 @@ body {
 .setup-equipe input:focus {
     border-color: var(--amarelo);
     box-shadow: 0 0 0 4px rgba(255, 217, 61, 0.35);
+    opacity: 1;
+}
+
+/* Botão remover equipe */
+.setup-equipe .btn-remover {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,0,0,0.15);
+    background: var(--branco);
+    color: #999;
+    font-size: 1.1rem;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.setup-equipe .btn-remover:hover {
+    background: #E74C3C;
+    color: var(--branco);
+    border-color: #C0392B;
+    transform: scale(1.15);
+}
+
+.setup-equipe .btn-remover.oculto {
+    display: none;
+}
+
+/* Emoji picker */
+.emoji-picker {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-105%);
+    background: var(--branco);
+    border: 3px solid #ddd;
+    border-radius: var(--radius);
+    padding: 12px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    box-shadow: 0 8px 30px var(--sombra-forte);
+    z-index: 100;
+    animation: fadeIn 0.2s ease;
+}
+
+.emoji-picker button {
+    font-size: 2rem;
+    background: none;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    padding: 6px;
+    transition: all 0.15s ease;
+}
+
+.emoji-picker button:hover {
+    background: var(--amarelo-fundo);
+    border-color: var(--amarelo);
+    transform: scale(1.2);
 }
 
 .setup-vs {
-    font-size: 3.2rem;
+    font-size: 2.8rem;
     font-weight: 900;
     color: var(--laranja);
     text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
     align-self: center;
+    padding: 0 16px;
+    flex-shrink: 0;
 }
 
 /* ============================================
@@ -385,13 +495,13 @@ body {
 }
 
 /* ============================================
-   Placar no topo
+   Placar no topo — dinâmico via custom properties
    ============================================ */
 #placar-topo {
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 14px 28px;
     background: linear-gradient(180deg, var(--branco), #F8F8F8);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -399,54 +509,47 @@ body {
     gap: 12px;
     z-index: 10;
     border-bottom: 3px solid #eee;
+    flex-wrap: wrap;
 }
 
 .placar-equipe {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 18px;
+    gap: 8px;
+    padding: 8px 14px;
     border-radius: var(--radius);
     transition: all 0.3s ease;
     border: 3px solid transparent;
+    background: var(--team-light, #f5f5f5);
+    border-color: rgba(0, 0, 0, 0.1);
 }
 
-.placar-equipe-1 {
-    background: var(--equipe-1-light);
-    border-color: rgba(231, 76, 60, 0.2);
-}
-
-.placar-equipe-2 {
-    background: var(--equipe-2-light);
-    border-color: rgba(59, 130, 246, 0.2);
+.placar-equipe.na-frente {
+    box-shadow: 0 0 20px var(--team-glow);
+    border-color: var(--team-color);
 }
 
 .placar-nome {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 800;
     color: var(--texto-escuro);
 }
 
+.placar-emoji {
+    font-size: 1.4rem;
+}
+
 .placar-pontos {
-    font-size: 3rem;
+    font-size: 2.4rem;
     font-weight: 900;
-    min-width: 50px;
+    min-width: 40px;
     text-align: center;
     line-height: 1;
-}
-
-.placar-equipe-1 .placar-pontos {
-    color: var(--equipe-1);
-    text-shadow: 1px 1px 0px rgba(231, 76, 60, 0.25);
-}
-
-.placar-equipe-2 .placar-pontos {
-    color: var(--equipe-2);
-    text-shadow: 1px 1px 0px rgba(59, 130, 246, 0.25);
+    color: var(--team-color, var(--texto-escuro));
 }
 
 .placar-coroa {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     opacity: 0;
     transition: all 0.3s ease;
     filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.2));
@@ -467,21 +570,21 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    flex: 1;
-    min-width: 0;
+    gap: 6px;
+    padding: 0 8px;
 }
 
 #placar-progresso {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 800;
     color: var(--texto-medio);
+    white-space: nowrap;
 }
 
 .barra-progresso {
     width: 100%;
-    max-width: 280px;
-    height: 14px;
+    max-width: 200px;
+    height: 12px;
     background: #E8E8E8;
     border-radius: 7px;
     overflow: hidden;
@@ -505,17 +608,6 @@ body {
     0% { transform: scale(1); }
     35% { transform: scale(1.7); }
     100% { transform: scale(1); }
-}
-
-/* Destaque equipe na frente */
-.placar-equipe-1.na-frente {
-    box-shadow: 0 0 20px var(--equipe-1-glow);
-    border-color: var(--equipe-1);
-}
-
-.placar-equipe-2.na-frente {
-    box-shadow: 0 0 20px var(--equipe-2-glow);
-    border-color: var(--equipe-2);
 }
 
 /* ============================================
@@ -562,13 +654,13 @@ body {
 }
 
 /* ============================================
-   Painéis de equipe (quem responde?)
+   Painéis de equipe (quem responde?) — dinâmico
    ============================================ */
 .paineis-equipe {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 28px;
+    gap: 16px;
     margin-bottom: 20px;
     flex-wrap: wrap;
 }
@@ -579,63 +671,37 @@ body {
     color: var(--laranja);
     text-align: center;
     text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.05);
+    width: 100%;
 }
 
 .painel-equipe {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    padding: 22px 40px;
+    gap: 8px;
+    padding: 18px 32px;
     border-radius: var(--radius-lg);
-    border: 4px solid transparent;
+    border: 4px solid var(--team-color, #ccc);
     cursor: pointer;
     font-family: inherit;
     font-size: 1rem;
     transition: all 0.3s ease;
-    min-width: 190px;
-}
-
-.painel-equipe-1 {
-    background: linear-gradient(180deg, #FBE3E1, #F0B0AB);
-    border-color: var(--equipe-1);
-    color: #8B1A1A;
-    box-shadow: 0 6px 0px #C0392B, 0 8px 20px rgba(231, 76, 60, 0.15);
-}
-
-.painel-equipe-2 {
-    background: linear-gradient(180deg, #DDE9FA, #A7C7F2);
-    border-color: var(--equipe-2);
-    color: #1A3B6E;
-    box-shadow: 0 6px 0px #1E5BB8, 0 8px 20px rgba(59, 130, 246, 0.15);
+    min-width: 160px;
+    background: var(--team-light, #f5f5f5);
+    color: var(--texto-escuro);
+    box-shadow: 0 6px 0px color-mix(in srgb, var(--team-color, #999) 70%, black), 0 8px 20px rgba(0,0,0,0.1);
 }
 
 .painel-equipe:hover {
     transform: translateY(-5px);
-}
-
-.painel-equipe-1:hover {
-    box-shadow: 0 11px 0px #C0392B, 0 14px 30px rgba(231, 76, 60, 0.25);
-}
-
-.painel-equipe-2:hover {
-    box-shadow: 0 11px 0px #1E5BB8, 0 14px 30px rgba(59, 130, 246, 0.25);
+    box-shadow: 0 11px 0px color-mix(in srgb, var(--team-color, #999) 70%, black), 0 14px 30px rgba(0,0,0,0.15);
 }
 
 .painel-equipe.selecionado {
     transform: scale(1.08);
-}
-
-.painel-equipe-1.selecionado {
-    background: linear-gradient(180deg, #E74C3C, #C0392B);
+    background: var(--team-color, #999);
     color: var(--branco);
-    box-shadow: 0 0 35px var(--equipe-1-glow);
-}
-
-.painel-equipe-2.selecionado {
-    background: linear-gradient(180deg, #3B82F6, #1E5BB8);
-    color: var(--branco);
-    box-shadow: 0 0 35px var(--equipe-2-glow);
+    box-shadow: 0 0 35px var(--team-glow);
 }
 
 .painel-equipe.opaco {
@@ -646,17 +712,18 @@ body {
 
 .painel-equipe.desativado {
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.3;
+    filter: grayscale(0.5);
 }
 
 .painel-emoji {
-    font-size: 3.2rem;
+    font-size: 2.8rem;
     filter: drop-shadow(2px 3px 4px rgba(0,0,0,0.15));
 }
 
 .painel-nome {
     font-weight: 800;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
 }
 
 /* ============================================
@@ -791,6 +858,7 @@ body {
    ============================================ */
 #tela-final {
     background: linear-gradient(180deg, #FFF4CC 0%, #FDEBD0 40%, #C8E6F9 100%);
+    overflow-y: auto;
 }
 
 #resultado-destaque {
@@ -807,19 +875,19 @@ body {
 
 .placar-final {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
-    gap: 36px;
+    gap: 24px;
     margin-bottom: 44px;
     flex-wrap: wrap;
 }
 
 .placar-final-equipe {
     text-align: center;
-    padding: 30px 40px;
+    padding: 24px 32px;
     border-radius: var(--radius-lg);
     background: var(--branco);
-    min-width: 230px;
+    min-width: 180px;
     box-shadow: 0 8px 30px var(--sombra);
     border: 4px solid #E0E0E0;
 }
@@ -831,23 +899,16 @@ body {
 }
 
 .placar-final-nome {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: 800;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     color: var(--texto-escuro);
 }
 
 .placar-final-pontos {
-    font-size: 5rem;
+    font-size: 4rem;
     font-weight: 900;
     line-height: 1;
-}
-
-.placar-final-vs {
-    font-size: 2.8rem;
-    font-weight: 900;
-    color: var(--laranja);
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.08);
 }
 
 /* ============================================
@@ -909,6 +970,27 @@ body {
    RESPONSIVIDADE
    ============================================ */
 
+/* Placar compacto com muitas equipes */
+.placar-topo-compact .placar-equipe {
+    padding: 6px 10px;
+}
+
+.placar-topo-compact .placar-nome {
+    font-size: 0.95rem;
+}
+
+.placar-topo-compact .placar-pontos {
+    font-size: 1.8rem;
+}
+
+.placar-topo-compact .placar-emoji {
+    font-size: 1.1rem;
+}
+
+.placar-topo-compact .placar-coroa {
+    font-size: 1.1rem;
+}
+
 /* Tablet */
 @media (max-width: 1024px) {
     .titulo-principal {
@@ -936,11 +1018,11 @@ body {
     }
 
     .placar-nome {
-        font-size: 1.15rem;
+        font-size: 1rem;
     }
 
     .placar-pontos {
-        font-size: 2.4rem;
+        font-size: 2rem;
     }
 
     #resultado-destaque {
@@ -948,7 +1030,12 @@ body {
     }
 
     .placar-final-pontos {
-        font-size: 4rem;
+        font-size: 3.2rem;
+    }
+
+    .setup-equipe {
+        width: 220px;
+        padding: 22px 18px;
     }
 }
 
@@ -970,18 +1057,19 @@ body {
 
     .setup-equipes {
         flex-direction: column;
-        gap: 16px;
         align-items: center;
+        gap: 0;
     }
 
     .setup-equipe {
         width: 100%;
         max-width: 300px;
-        padding: 24px 20px;
+        padding: 22px 18px;
     }
 
     .setup-vs {
-        font-size: 2.2rem;
+        font-size: 2rem;
+        padding: 6px 0;
     }
 
     .pergunta-texto {
@@ -993,47 +1081,51 @@ body {
     }
 
     #placar-topo {
-        padding: 10px 12px;
-        flex-wrap: wrap;
+        padding: 8px 10px;
         gap: 6px;
     }
 
     .placar-equipe {
-        padding: 6px 10px;
+        padding: 5px 8px;
+        gap: 4px;
     }
 
     .placar-nome {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
     }
 
     .placar-pontos {
-        font-size: 1.9rem;
+        font-size: 1.6rem;
+    }
+
+    .placar-emoji {
+        font-size: 1rem;
     }
 
     #placar-progresso {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
 
     .barra-progresso {
-        height: 10px;
-        max-width: 200px;
+        height: 8px;
+        max-width: 140px;
     }
 
     .paineis-equipe {
-        gap: 12px;
+        gap: 10px;
     }
 
     .painel-equipe {
-        padding: 14px 24px;
-        min-width: 140px;
+        padding: 12px 20px;
+        min-width: 120px;
     }
 
     .painel-emoji {
-        font-size: 2.4rem;
+        font-size: 2rem;
     }
 
     .painel-nome {
-        font-size: 1.05rem;
+        font-size: 0.95rem;
     }
 
     .alternativa {
@@ -1059,6 +1151,11 @@ body {
         padding: 14px 36px;
     }
 
+    .btn-adicionar {
+        font-size: 1.1rem;
+        padding: 12px 24px;
+    }
+
     .status-msg {
         font-size: 1.3rem;
     }
@@ -1068,20 +1165,16 @@ body {
     }
 
     .placar-final-pontos {
-        font-size: 3.2rem;
+        font-size: 2.8rem;
     }
 
     .placar-final-equipe {
-        min-width: 155px;
-        padding: 20px 24px;
+        min-width: 140px;
+        padding: 18px 20px;
     }
 
     .placar-final-nome {
-        font-size: 1.2rem;
-    }
-
-    .placar-final-vs {
-        font-size: 2rem;
+        font-size: 1.1rem;
     }
 
     /* Esconder algumas decorações no mobile */

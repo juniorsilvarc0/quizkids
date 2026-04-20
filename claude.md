@@ -2,7 +2,7 @@
 
 ## Contexto
 
-Você está implementando um quiz interativo infantil chamado **"Quiz Igreja Viva"** para ser projetado em tela cheia durante atividades com crianças na igreja. Leia `prod.md` para entender o produto e `spec.md` para a especificação técnica completa.
+Você está implementando um quiz interativo infantil chamado **"Reconectando — Identidade Original"** para ser projetado em tela cheia durante atividades com crianças na igreja. Leia `prod.md` para entender o produto e `spec.md` para a especificação técnica completa.
 
 ## Stack
 
@@ -13,7 +13,7 @@ Você está implementando um quiz interativo infantil chamado **"Quiz Igreja Viv
 ## Estrutura de Arquivos
 
 ```
-quiz-igreja-viva/
+reconectando-identidade-original/
 ├── docker-compose.yml
 ├── Dockerfile
 ├── nginx.conf
@@ -61,7 +61,7 @@ quiz-igreja-viva/
 ### JavaScript
 
 #### questions.js
-- Array `const questions = [...]` com as 20 perguntas do quiz
+- Array `const questions = [...]` com as 30 perguntas do quiz
 - Cada objeto: `{ id, question, options: [{letter, text}], correct }`
 - Exportar como variável global
 
@@ -84,7 +84,8 @@ quiz-igreja-viva/
 
 #### app.js
 - Classe principal `QuizApp`
-- Estado: `{ currentQuestion: 0, score: 0, state: "start"|"question"|"answered"|"finished" }`
+- Sistema de equipes dinâmico (2 a 6 equipes)
+- Estado: `{ currentQuestion: 0, teams: [...], state: "start"|"setup"|"question"|"finished" }`
 - Fluxo:
   1. `init()` — setup event listeners (mouse + teclado)
   2. `start()` — transição para primeira pergunta
@@ -93,7 +94,7 @@ quiz-igreja-viva/
   5. `nextQuestion()` — avança ou vai para tela final
   6. `showResults()` — placar + celebração
   7. `restart()` — volta ao início
-- Atalhos de teclado: A/B/C ou 1/2/3 para selecionar, Enter/→ para próxima, F para fullscreen
+- Atalhos de teclado: 1-6 para selecionar equipe, A/B/C para alternativas, Enter/→ para próxima, F para fullscreen
 - Botão de fullscreen no canto da tela (usar `document.documentElement.requestFullscreen()`)
 - Bloquear duplo-clique (desabilitar alternativas após responder)
 
@@ -125,10 +126,10 @@ server {
     server_name localhost;
     root /usr/share/nginx/html;
     index index.html;
-    
+
     gzip on;
     gzip_types text/css application/javascript text/html;
-    
+
     location / {
         try_files $uri $uri/ /index.html;
     }
@@ -147,18 +148,18 @@ server {
 8. Tela final mostra placar com celebração
 9. "Jogar Novamente" reinicia tudo
 10. Funciona em fullscreen (tecla F ou botão)
-11. Teclado funciona (1/2/3 ou A/B/C + Enter)
+11. Teclado funciona (1-6 para equipes, A/B/C + Enter)
 12. Responsivo em tela de projetor, notebook e tablet
 13. Zero erros no console do browser
 
 ## Como Rodar
 
 ```bash
-cd quiz-igreja-viva
+cd reconectando-identidade-original
 docker compose up --build -d
 # Abrir http://localhost:3004
 ```
 
 ## Dados do Quiz
 
-As 20 perguntas estão documentadas em `prod.md`. Copie-as fielmente para `questions.js`.
+As 30 perguntas estão documentadas em `prod.md`. Copie-as fielmente para `questions.js`.

@@ -1,5 +1,5 @@
 /**
- * Quiz Igreja Viva — Gerenciador de Sons
+ * Reconectando — Identidade Original — Gerenciador de Sons
  * Sons sintetizados via Web Audio API (sem arquivos externos)
  */
 

@@ -1,6 +1,29 @@
 services:
   quiz:
-    build: .
-    ports:
-      - "3004:80"
-    restart: unless-stopped
+    image: quizkids:latest
+    networks:
+      - earthnet
+    deploy:
+      labels:
+        # Habilita o Traefik para este serviço
+        - "traefik.enable=true"
+        - "traefik.docker.network=earthnet"
+
+        # --- Roteador para HTTPS ---
+        - "traefik.http.routers.quizkids-secure.rule=Host(`quizrec.spincode.com.br`)"
+        - "traefik.http.routers.quizkids-secure.entrypoints=websecure"
+        - "traefik.http.routers.quizkids-secure.tls.certresolver=letsencryptresolver"
+
+        # --- Redirecionamento de HTTP para HTTPS ---
+        - "traefik.http.routers.quizkids-http.rule=Host(`quizrec.spincode.com.br`)"
+        - "traefik.http.routers.quizkids-http.entrypoints=web"
+        - "traefik.http.routers.quizkids-http.middlewares=redirect-to-https"
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+        # --- Definição do Serviço ---
+        - "traefik.http.services.quizkids.loadbalancer.server.port=80"
+
+networks:
+  earthnet:
+    external: true
